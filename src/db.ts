@@ -1,5 +1,4 @@
 import { connect } from "@tursodatabase/database";
-import { existsSync } from "fs";
 import { homedir } from "os";
 import { join } from "path";
 

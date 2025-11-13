@@ -1,5 +1,6 @@
 import { commandHelp } from "./command_help.js";
 import { commandExit } from "./command_exit.js";
+import { commandCreate } from "./command_create.js";
 import type { CLICommand } from "./state.js";
 
 export function getCommands(): Record<string, CLICommand> {
@@ -13,6 +14,11 @@ export function getCommands(): Record<string, CLICommand> {
       name: "exit",
       description: "Exits the application",
       callback: commandExit,
+    },
+    create: {
+      name: "create",
+      description: "Creates a new application",
+      callback: commandCreate,
     },
   };
 }
