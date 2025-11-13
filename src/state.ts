@@ -1,6 +1,7 @@
 import { createInterface, type Interface } from "readline";
 import { getCommands } from "./commands.js";
-
+import { Database } from "@tursodatabase/database";
+import { db } from "./db.js";
 export type CLICommand = {
   name: string;
   description: string;
@@ -9,6 +10,7 @@ export type CLICommand = {
 
 export type State = {
   readline: Interface;
+  db: Database;
   commands: Record<string, CLICommand>;
 };
 
@@ -20,6 +22,7 @@ export function initState(): State {
   });
   return {
     readline: rl,
+    db: db,
     commands: getCommands(),
   };
 }
