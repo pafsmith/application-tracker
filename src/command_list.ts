@@ -1,27 +1,9 @@
-import { State } from "./state";
+import { State } from "./state.js";
+import { getAllJobsWithLatestStatus } from "./queries.js";
 
 export async function commandList(state: State) {
   try {
-    // Query all jobs with their latest status
-    const jobsStmt = state.db.prepare(`
-      SELECT
-        j.*,
-        s.status,
-        s.updated_at as status_updated_at
-      FROM jobs j
-      LEFT JOIN (
-        SELECT job_id, status, updated_at
-        FROM job_status_updates
-        WHERE (job_id, updated_at) IN (
-          SELECT job_id, MAX(updated_at)
-          FROM job_status_updates
-          GROUP BY job_id
-        )
-      ) s ON j.id = s.job_id
-      ORDER BY j.created_at DESC
-    `);
-
-    const jobs = await jobsStmt.all();
+    const jobs = await getAllJobsWithLatestStatus();
 
     if (jobs.length === 0) {
       console.log(

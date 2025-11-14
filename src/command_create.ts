@@ -1,4 +1,5 @@
-import { State } from "./state";
+ import { State } from "./state.js";
+import { insertJob, insertJobStatusUpdate, type JobData } from "./queries.js";
 
 function askQuestion(rl: any, question: string): Promise<string> {
   return new Promise((resolve) => {
@@ -64,36 +65,26 @@ export async function commandCreate(state: State, ...args: string[]) {
   }
 
   try {
-    // Insert the job into the database
-    const insertStmt = state.db.prepare(`
-      INSERT INTO jobs (company, position, location, salary_range, job_description, application_date)
-      VALUES (?, ?, ?, ?, ?, ?)
-    `);
-
-    const result = await insertStmt.run(
+    const jobData: JobData = {
       company,
       position,
-      location || null,
-      salaryRange || null,
-      jobDescription || null,
-      applicationDate || null,
-    );
+      location: location || undefined,
+      salaryRange: salaryRange || undefined,
+      jobDescription: jobDescription || undefined,
+      applicationDate: applicationDate || undefined,
+    };
+
+    const jobId = await insertJob(jobData);
 
     console.log(
-      `\nJob application created successfully! (ID: ${result.lastInsertRowid})`,
+      `\nJob application created successfully! (ID: ${jobId})`,
     );
 
-    // Create initial status update
-    const statusStmt = state.db.prepare(`
-      INSERT INTO job_status_updates (job_id, status, notes)
-      VALUES (?, ?, ?)
-    `);
-
-    await statusStmt.run(
-      result.lastInsertRowid,
-      "Applied",
-      "Initial application submitted",
-    );
+    await insertJobStatusUpdate({
+      jobId,
+      status: "Applied",
+      notes: "Initial application submitted",
+    });
 
     console.log("Initial status set to 'Applied'.");
   } catch (error) {
